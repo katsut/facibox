@@ -64,7 +64,9 @@ export function ThemePicker({ data, onUpdate }: Props) {
           className="text-input"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && addItem()}
+          onKeyDown={(e) =>
+            e.key === "Enter" && !e.nativeEvent.isComposing && addItem()
+          }
           placeholder="テーマを入力..."
         />
         <button className="secondary-button" onClick={addItem}>
