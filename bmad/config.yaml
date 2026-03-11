@@ -1,0 +1,5 @@
+# FaciBox - Project Configuration
+project_name: "FaciBox"
+project_type: "Chrome Extension"
+project_level: 2
+output_folder: "docs"

@@ -1,0 +1,81 @@
+version: "6.0.0"
+project_name: "FaciBox"
+project_level: 2
+current_sprint: 1
+sprint_plan_path: "docs/sprint-plan-facibox-2026-03-11.md"
+
+sprints:
+  - sprint_number: 1
+    capacity_points: 12
+    committed_points: 12
+    completed_points: 0
+    status: "not_started"
+    goal: "Extension の基盤を構築し、最初の機能（ダイス）を動作させる"
+    stories:
+      - story_id: "STORY-001"
+        title: "プロジェクトセットアップ"
+        points: 3
+        status: "not_started"
+      - story_id: "STORY-002"
+        title: "モーダル表示/非表示"
+        points: 5
+        status: "not_started"
+      - story_id: "STORY-003"
+        title: "タブナビゲーション"
+        points: 2
+        status: "not_started"
+      - story_id: "STORY-004"
+        title: "ダイス機能"
+        points: 2
+        status: "not_started"
+
+  - sprint_number: 2
+    capacity_points: 12
+    committed_points: 9
+    completed_points: 0
+    status: "not_started"
+    goal: "ルーレット・タイマー・テーマ決定の 3 機能を実装"
+    stories:
+      - story_id: "STORY-005"
+        title: "ルーレット機能"
+        points: 3
+        status: "not_started"
+      - story_id: "STORY-006"
+        title: "タイマー機能"
+        points: 3
+        status: "not_started"
+      - story_id: "STORY-007"
+        title: "テーマ決定機能"
+        points: 3
+        status: "not_started"
+
+  - sprint_number: 3
+    capacity_points: 12
+    committed_points: 9
+    completed_points: 0
+    status: "not_started"
+    goal: "データ永続化と UI 仕上げ、リリース可能な状態にする"
+    stories:
+      - story_id: "STORY-008"
+        title: "データ保存・復元"
+        points: 3
+        status: "not_started"
+      - story_id: "STORY-009"
+        title: "リセット機能"
+        points: 2
+        status: "not_started"
+      - story_id: "STORY-010"
+        title: "UI ブラッシュアップ"
+        points: 4
+        status: "not_started"
+
+velocity:
+  sprint_1: null
+  sprint_2: null
+  sprint_3: null
+  rolling_average: null
+
+team:
+  size: 1
+  sprint_length_weeks: 1
+  capacity_per_sprint: 12

@@ -1,0 +1,368 @@
+:host {
+  all: initial;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* === Variables === */
+:host {
+  --fb-primary: #4f6df5;
+  --fb-danger: #e5484d;
+  --fb-bg: #ffffff;
+  --fb-surface: #ffffff;
+  --fb-hover: #f4f4f5;
+  --fb-border: #e4e4e7;
+  --fb-text: #18181b;
+  --fb-text-muted: #71717a;
+}
+
+/* === Overlay === */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+}
+
+/* === Modal === */
+.modal {
+  position: fixed;
+  width: 380px;
+  max-height: 520px;
+  display: flex;
+  flex-direction: column;
+  background: var(--fb-surface);
+  border: 1px solid var(--fb-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+  color: var(--fb-text);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--fb-border);
+  cursor: grab;
+  user-select: none;
+}
+
+.modal-header:active {
+  cursor: grabbing;
+}
+
+.modal-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--fb-text);
+}
+
+.modal-close {
+  border: none;
+  background: none;
+  font-size: 14px;
+  color: var(--fb-text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.modal-close:hover {
+  background: var(--fb-hover);
+  color: var(--fb-text);
+}
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px 16px;
+}
+
+/* === Tab Nav === */
+.tab-nav {
+  display: flex;
+  border-bottom: 1px solid var(--fb-border);
+  gap: 0;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  background: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fb-text-muted);
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-button:hover {
+  color: var(--fb-text);
+}
+
+.tab-button.active {
+  color: var(--fb-primary);
+  border-bottom-color: var(--fb-primary);
+}
+
+/* === Tab Content === */
+.tab-content {
+  padding-top: 16px;
+}
+
+/* === Common === */
+.text-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--fb-border);
+  border-radius: 6px;
+  font-size: 14px;
+  background: var(--fb-bg);
+  color: var(--fb-text);
+}
+
+.number-input {
+  width: 64px;
+  padding: 6px 8px;
+  border: 1px solid var(--fb-border);
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+  background: var(--fb-bg);
+  color: var(--fb-text);
+}
+
+.primary-button {
+  padding: 12px 48px;
+  border: none;
+  border-radius: 8px;
+  background: var(--fb-primary);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.primary-button:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.primary-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.secondary-button {
+  padding: 8px 16px;
+  border: 1px solid var(--fb-border);
+  border-radius: 6px;
+  background: var(--fb-bg);
+  color: var(--fb-text);
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.secondary-button:hover {
+  background: var(--fb-hover);
+}
+
+.result-display {
+  font-size: 72px;
+  font-weight: 700;
+  color: var(--fb-primary);
+  line-height: 1;
+  text-align: center;
+}
+
+.result-display-sm {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--fb-primary);
+  text-align: center;
+  padding: 8px;
+}
+
+/* === Dice === */
+.dice-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.dice-setting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dice-setting label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--fb-text);
+}
+
+/* === List (Roulette / Theme) === */
+.list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 160px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: var(--fb-hover);
+  font-size: 14px;
+  color: var(--fb-text);
+}
+
+.remove-button {
+  border: none;
+  background: none;
+  color: var(--fb-text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 6px;
+}
+
+.remove-button:hover {
+  color: var(--fb-danger);
+}
+
+/* === Timer === */
+.timer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.timer-setting {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.timer-setting label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--fb-text);
+}
+
+.timer-display {
+  font-size: 72px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--fb-text);
+  line-height: 1;
+}
+
+.timer-display.finished {
+  color: var(--fb-danger);
+}
+
+.timer-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.start-button {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--fb-primary);
+  color: #fff;
+  transition: opacity 0.15s;
+}
+
+.stop-button {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--fb-danger);
+  color: #fff;
+  transition: opacity 0.15s;
+}
+
+.reset-button {
+  padding: 10px 24px;
+  border: 1px solid var(--fb-border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--fb-hover);
+  color: var(--fb-text);
+  transition: opacity 0.15s;
+}
+
+.start-button:hover,
+.stop-button:hover,
+.reset-button:hover {
+  opacity: 0.85;
+}
+
+/* === Reset === */
+.reset-all-button {
+  margin-top: 16px;
+  padding: 6px 12px;
+  border: 1px solid var(--fb-border);
+  border-radius: 6px;
+  background: none;
+  color: var(--fb-text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.reset-all-button:hover {
+  background: var(--fb-hover);
+  color: var(--fb-text);
+}

@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "FaciBox",
+  "description": "ファシリテーターの道具箱 — ダイス・ルーレット・タイマー・テーマ決定",
+  "version": "0.1.0",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "FaciBox"
+  },
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/index.ts"]
+    }
+  ],
+  "permissions": ["storage"]
+}

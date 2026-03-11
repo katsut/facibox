@@ -1,0 +1,18 @@
+# BMAD Workflow Status - FaciBox
+project_name: "FaciBox"
+project_level: 2
+last_updated: "2026-03-11"
+
+workflow_status:
+  - name: product-brief
+    phase: 1
+    status: skipped
+  - name: prd
+    phase: 2
+    status: docs/prd-facibox-2026-03-11.md
+  - name: architecture
+    phase: 3
+    status: docs/architecture-facibox-2026-03-11.md
+  - name: sprint-planning
+    phase: 4
+    status: docs/sprint-plan-facibox-2026-03-11.md
