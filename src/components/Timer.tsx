@@ -6,6 +6,9 @@ interface Props {
   onUpdate: (data: TimerData) => void;
 }
 
+const RING_RADIUS = 78;
+const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+
 export function Timer({ data, onUpdate }: Props) {
   const { minutes, seconds, running, finished, start, stop, reset } = useTimer({
     initialMinutes: data.minutes,
@@ -13,6 +16,12 @@ export function Timer({ data, onUpdate }: Props) {
   });
 
   const pad = (n: number) => String(n).padStart(2, "0");
+
+  const initialTotal = data.minutes * 60 + data.seconds;
+  const currentTotal = minutes * 60 + seconds;
+  const progress = initialTotal > 0 ? currentTotal / initialTotal : 0;
+  const dashOffset = RING_CIRCUMFERENCE * (1 - progress);
+  const isDanger = running && currentTotal <= 10 && currentTotal > 0;
 
   return (
     <div className="timer-container">
@@ -55,8 +64,26 @@ export function Timer({ data, onUpdate }: Props) {
           </label>
         </div>
       )}
-      <div className={`timer-display ${finished ? "finished" : ""}`}>
-        {pad(minutes)}:{pad(seconds)}
+      <div className="timer-ring-wrapper">
+        <svg
+          className="timer-ring"
+          width="180"
+          height="180"
+          viewBox="0 0 180 180"
+        >
+          <circle className="timer-ring-bg" cx="90" cy="90" r={RING_RADIUS} />
+          <circle
+            className={`timer-ring-progress ${isDanger ? "danger" : ""}`}
+            cx="90"
+            cy="90"
+            r={RING_RADIUS}
+            strokeDasharray={RING_CIRCUMFERENCE}
+            strokeDashoffset={dashOffset}
+          />
+        </svg>
+        <div className={`timer-time ${finished ? "finished" : ""}`}>
+          {pad(minutes)}:{pad(seconds)}
+        </div>
       </div>
       <div className="timer-buttons">
         {!running ? (

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { RouletteData } from "../types";
 
 interface Props {
@@ -9,6 +9,10 @@ interface Props {
 export function Roulette({ data, onUpdate }: Props) {
   const [input, setInput] = useState("");
   const [result, setResult] = useState<string | null>(null);
+  const [spinning, setSpinning] = useState(false);
+  const [spinDisplay, setSpinDisplay] = useState("");
+  const [highlightIdx, setHighlightIdx] = useState<number | null>(null);
+  const spinRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const addItem = () => {
     const trimmed = input.trim();
@@ -22,9 +26,34 @@ export function Roulette({ data, onUpdate }: Props) {
   };
 
   const spin = () => {
-    if (data.items.length === 0) return;
-    const idx = Math.floor(Math.random() * data.items.length);
-    setResult(data.items[idx]);
+    if (data.items.length === 0 || spinning) return;
+    setSpinning(true);
+    setResult(null);
+    setHighlightIdx(null);
+
+    let delay = 50;
+    let step = 0;
+    const totalSteps = 20;
+
+    const tick = () => {
+      const idx = Math.floor(Math.random() * data.items.length);
+      setSpinDisplay(data.items[idx]);
+      step++;
+
+      if (step >= totalSteps) {
+        const finalIdx = Math.floor(Math.random() * data.items.length);
+        setSpinDisplay("");
+        setResult(data.items[finalIdx]);
+        setHighlightIdx(finalIdx);
+        setSpinning(false);
+        return;
+      }
+
+      delay += step * 8;
+      spinRef.current = setTimeout(tick, delay);
+    };
+
+    tick();
   };
 
   return (
@@ -45,7 +74,7 @@ export function Roulette({ data, onUpdate }: Props) {
       {data.items.length > 0 && (
         <ul className="item-list">
           {data.items.map((item, i) => (
-            <li key={i}>
+            <li key={i} className={highlightIdx === i ? "highlighted" : ""}>
               <span>{item}</span>
               <button className="remove-button" onClick={() => removeItem(i)}>
                 ✕
@@ -54,15 +83,18 @@ export function Roulette({ data, onUpdate }: Props) {
           ))}
         </ul>
       )}
+      {spinning && <div className="spin-overlay">{spinDisplay}</div>}
       <button
         className="primary-button"
         onClick={spin}
-        disabled={data.items.length === 0}
+        disabled={data.items.length === 0 || spinning}
         style={{ padding: "12px" }}
       >
-        回す
+        {spinning ? "選出中..." : "回す"}
       </button>
-      {result !== null && <div className="result-display-sm">{result}</div>}
+      {result !== null && !spinning && (
+        <div className="result-display-sm">{result}</div>
+      )}
     </div>
   );
 }

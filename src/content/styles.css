@@ -15,13 +15,133 @@
 /* === Variables === */
 :host {
   --fb-primary: #4f6df5;
+  --fb-primary-light: #818cf8;
+  --fb-primary-bg: rgba(79, 109, 245, 0.08);
   --fb-danger: #e5484d;
+  --fb-success: #30a46c;
   --fb-bg: #ffffff;
   --fb-surface: #ffffff;
   --fb-hover: #f4f4f5;
   --fb-border: #e4e4e7;
   --fb-text: #18181b;
   --fb-text-muted: #71717a;
+  --fb-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  --fb-radius: 12px;
+}
+
+/* === Animations === */
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  10% {
+    transform: rotate(-12deg) scale(1.1);
+  }
+  20% {
+    transform: rotate(12deg) scale(1.1);
+  }
+  30% {
+    transform: rotate(-10deg);
+  }
+  40% {
+    transform: rotate(10deg);
+  }
+  50% {
+    transform: rotate(-6deg);
+  }
+  60% {
+    transform: rotate(6deg);
+  }
+  70% {
+    transform: rotate(-3deg);
+  }
+  80% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes spin-slot {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  51% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(229, 72, 77, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(229, 72, 77, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(229, 72, 77, 0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes highlight-pick {
+  0% {
+    background: var(--fb-primary);
+    color: #fff;
+    transform: scale(1.03);
+  }
+  100% {
+    background: var(--fb-hover);
+    color: var(--fb-text);
+    transform: scale(1);
+  }
 }
 
 /* === Overlay === */
@@ -34,26 +154,31 @@
 /* === Modal === */
 .modal {
   position: fixed;
-  width: 380px;
-  max-height: 520px;
+  width: 400px;
+  max-height: 540px;
   display: flex;
   flex-direction: column;
   background: var(--fb-surface);
   border: 1px solid var(--fb-border);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  border-radius: var(--fb-radius);
+  box-shadow: var(--fb-shadow);
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow: hidden;
   color: var(--fb-text);
+  animation: modal-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--fb-border);
+  padding: 14px 16px;
+  background: linear-gradient(
+    135deg,
+    var(--fb-primary),
+    var(--fb-primary-light)
+  );
   cursor: grab;
   user-select: none;
 }
@@ -63,24 +188,26 @@
 }
 
 .modal-title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
-  color: var(--fb-text);
+  color: #fff;
+  letter-spacing: 0.5px;
 }
 
 .modal-close {
   border: none;
-  background: none;
-  font-size: 14px;
-  color: var(--fb-text-muted);
+  background: rgba(255, 255, 255, 0.15);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 6px;
+  transition: background 0.15s;
 }
 
 .modal-close:hover {
-  background: var(--fb-hover);
-  color: var(--fb-text);
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
 }
 
 .modal-body {
@@ -92,75 +219,109 @@
 /* === Tab Nav === */
 .tab-nav {
   display: flex;
-  border-bottom: 1px solid var(--fb-border);
-  gap: 0;
+  background: var(--fb-hover);
+  padding: 4px;
+  gap: 2px;
 }
 
 .tab-button {
   flex: 1;
-  padding: 10px 0;
+  padding: 8px 0;
   border: none;
   background: none;
   font-size: 13px;
   font-weight: 500;
   color: var(--fb-text-muted);
   cursor: pointer;
-  transition:
-    color 0.15s,
-    border-color 0.15s;
-  border-bottom: 2px solid transparent;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 .tab-button:hover {
   color: var(--fb-text);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .tab-button.active {
   color: var(--fb-primary);
-  border-bottom-color: var(--fb-primary);
+  background: var(--fb-surface);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  font-weight: 600;
 }
 
 /* === Tab Content === */
 .tab-content {
   padding-top: 16px;
+  animation: fade-up 0.2s ease;
 }
 
 /* === Common === */
 .text-input {
   flex: 1;
-  padding: 8px 12px;
+  padding: 10px 12px;
   border: 1px solid var(--fb-border);
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
   background: var(--fb-bg);
   color: var(--fb-text);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: var(--fb-primary);
+  box-shadow: 0 0 0 3px var(--fb-primary-bg);
 }
 
 .number-input {
   width: 64px;
-  padding: 6px 8px;
+  padding: 8px;
   border: 1px solid var(--fb-border);
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
   text-align: center;
   background: var(--fb-bg);
   color: var(--fb-text);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.number-input:focus {
+  outline: none;
+  border-color: var(--fb-primary);
+  box-shadow: 0 0 0 3px var(--fb-primary-bg);
 }
 
 .primary-button {
   padding: 12px 48px;
   border: none;
-  border-radius: 8px;
-  background: var(--fb-primary);
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    var(--fb-primary),
+    var(--fb-primary-light)
+  );
   color: #fff;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(79, 109, 245, 0.3);
 }
 
 .primary-button:hover:not(:disabled) {
-  opacity: 0.85;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(79, 109, 245, 0.4);
+}
+
+.primary-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(79, 109, 245, 0.3);
 }
 
 .primary-button:disabled {
@@ -169,34 +330,42 @@
 }
 
 .secondary-button {
-  padding: 8px 16px;
+  padding: 10px 16px;
   border: 1px solid var(--fb-border);
-  border-radius: 6px;
+  border-radius: 8px;
   background: var(--fb-bg);
   color: var(--fb-text);
   font-size: 14px;
   cursor: pointer;
   white-space: nowrap;
+  transition: all 0.15s;
 }
 
 .secondary-button:hover {
   background: var(--fb-hover);
+  border-color: var(--fb-primary);
+  color: var(--fb-primary);
 }
 
+/* === Result displays === */
 .result-display {
-  font-size: 72px;
-  font-weight: 700;
+  font-size: 80px;
+  font-weight: 800;
   color: var(--fb-primary);
   line-height: 1;
   text-align: center;
+  animation: bounce-in 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .result-display-sm {
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 700;
   color: var(--fb-primary);
   text-align: center;
-  padding: 8px;
+  padding: 12px 16px;
+  background: var(--fb-primary-bg);
+  border-radius: 10px;
+  animation: bounce-in 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* === Dice === */
@@ -204,7 +373,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
 }
 
 .dice-setting {
@@ -219,6 +388,36 @@
   gap: 8px;
   font-size: 14px;
   color: var(--fb-text);
+}
+
+.dice-visual {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(145deg, #ffffff, #f0f0f3);
+  border: 2px solid var(--fb-border);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    4px 4px 12px rgba(0, 0, 0, 0.08),
+    -2px -2px 8px rgba(255, 255, 255, 0.9);
+}
+
+.dice-visual.rolling {
+  animation: shake 0.5s ease-in-out;
+}
+
+.dice-visual .dice-value {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--fb-primary);
+  animation: bounce-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dice-visual .dice-placeholder {
+  font-size: 32px;
+  color: var(--fb-border);
 }
 
 /* === List (Roulette / Theme) === */
@@ -248,11 +447,21 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 10px;
-  border-radius: 4px;
+  padding: 8px 12px;
+  border-radius: 8px;
   background: var(--fb-hover);
   font-size: 14px;
   color: var(--fb-text);
+  transition: all 0.2s;
+  animation: fade-up 0.2s ease;
+}
+
+.item-list li:hover {
+  background: var(--fb-primary-bg);
+}
+
+.item-list li.highlighted {
+  animation: highlight-pick 1.5s ease forwards;
 }
 
 .remove-button {
@@ -261,11 +470,27 @@
   color: var(--fb-text-muted);
   cursor: pointer;
   font-size: 12px;
-  padding: 2px 6px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.15s;
 }
 
 .remove-button:hover {
   color: var(--fb-danger);
+  background: rgba(229, 72, 77, 0.1);
+}
+
+/* === Roulette spinning overlay === */
+.spin-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--fb-primary);
+  min-height: 60px;
+  animation: spin-slot 0.12s linear infinite;
 }
 
 /* === Timer === */
@@ -273,7 +498,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
 }
 
 .timer-setting {
@@ -290,16 +515,52 @@
   color: var(--fb-text);
 }
 
-.timer-display {
-  font-size: 72px;
+.timer-ring-wrapper {
+  position: relative;
+  width: 180px;
+  height: 180px;
+}
+
+.timer-ring {
+  transform: rotate(-90deg);
+}
+
+.timer-ring-bg {
+  fill: none;
+  stroke: var(--fb-hover);
+  stroke-width: 6;
+}
+
+.timer-ring-progress {
+  fill: none;
+  stroke: var(--fb-primary);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition:
+    stroke-dashoffset 1s linear,
+    stroke 0.3s;
+}
+
+.timer-ring-progress.danger {
+  stroke: var(--fb-danger);
+}
+
+.timer-time {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--fb-text);
-  line-height: 1;
 }
 
-.timer-display.finished {
+.timer-time.finished {
   color: var(--fb-danger);
+  animation: pulse-ring 1.5s infinite;
+  border-radius: 50%;
 }
 
 .timer-buttons {
@@ -308,61 +569,81 @@
 }
 
 .start-button {
-  padding: 10px 24px;
+  padding: 10px 28px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  background: var(--fb-primary);
+  background: linear-gradient(
+    135deg,
+    var(--fb-primary),
+    var(--fb-primary-light)
+  );
   color: #fff;
-  transition: opacity 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(79, 109, 245, 0.3);
+}
+
+.start-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 109, 245, 0.4);
 }
 
 .stop-button {
-  padding: 10px 24px;
+  padding: 10px 28px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  background: var(--fb-danger);
+  background: linear-gradient(135deg, var(--fb-danger), #f76b6e);
   color: #fff;
-  transition: opacity 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(229, 72, 77, 0.3);
+}
+
+.stop-button:hover {
+  transform: translateY(-1px);
 }
 
 .reset-button {
-  padding: 10px 24px;
+  padding: 10px 28px;
   border: 1px solid var(--fb-border);
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  background: var(--fb-hover);
+  background: var(--fb-bg);
   color: var(--fb-text);
-  transition: opacity 0.15s;
+  transition: all 0.15s;
 }
 
-.start-button:hover,
-.stop-button:hover,
 .reset-button:hover {
-  opacity: 0.85;
+  background: var(--fb-hover);
+  border-color: var(--fb-text-muted);
 }
 
-/* === Reset === */
+/* === Reset All === */
 .reset-all-button {
   margin-top: 16px;
-  padding: 6px 12px;
+  padding: 8px 12px;
   border: 1px solid var(--fb-border);
-  border-radius: 6px;
+  border-radius: 8px;
   background: none;
   color: var(--fb-text-muted);
   font-size: 12px;
   cursor: pointer;
   width: 100%;
+  transition: all 0.15s;
 }
 
 .reset-all-button:hover {
-  background: var(--fb-hover);
-  color: var(--fb-text);
+  background: rgba(229, 72, 77, 0.06);
+  border-color: var(--fb-danger);
+  color: var(--fb-danger);
 }
