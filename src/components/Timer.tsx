@@ -1,21 +1,23 @@
 import type { TimerData } from "../types";
-import { useTimer } from "../hooks/useTimer";
+import type { TimerState } from "../hooks/useTimer";
+import { useI18n } from "../i18n";
 
 interface Props {
   data: TimerData;
   onUpdate: (data: TimerData) => void;
+  collapsed: boolean;
+  timer: TimerState;
 }
 
 const SIZE = 200;
+const MINI_SIZE = 80;
 const STROKE = 8;
 const RADIUS = (SIZE - STROKE) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-export function Timer({ data, onUpdate }: Props) {
-  const { minutes, seconds, running, overtime, start, stop, reset } = useTimer({
-    initialMinutes: data.minutes,
-    initialSeconds: data.seconds,
-  });
+export function Timer({ data, onUpdate, collapsed, timer }: Props) {
+  const { t } = useI18n();
+  const { minutes, seconds, running, overtime, start, stop, reset } = timer;
 
   const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -36,12 +38,69 @@ export function Timer({ data, onUpdate }: Props) {
   const dashOffset = CIRCUMFERENCE * (1 - progress);
   const isIdle = !running && !overtime;
 
+  const miniStroke = 4;
+  const miniRadius = (MINI_SIZE - miniStroke) / 2;
+  const miniCirc = 2 * Math.PI * miniRadius;
+  const miniDashOffset = miniCirc * (1 - progress);
+
+  if (collapsed) {
+    return (
+      <div className="timer-mini">
+        <svg
+          className="timer-ring"
+          width={MINI_SIZE}
+          height={MINI_SIZE}
+          viewBox={`0 0 ${MINI_SIZE} ${MINI_SIZE}`}
+        >
+          <defs>
+            <linearGradient
+              id="timerGradMini"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" stopColor={isDanger ? "#ef4444" : "#4f6df5"} />
+              <stop
+                offset="100%"
+                stopColor={isDanger ? "#f97316" : "#818cf8"}
+              />
+            </linearGradient>
+          </defs>
+          <circle
+            className="timer-ring-bg"
+            cx={MINI_SIZE / 2}
+            cy={MINI_SIZE / 2}
+            r={miniRadius}
+            strokeWidth={miniStroke}
+          />
+          <circle
+            className="timer-ring-progress"
+            cx={MINI_SIZE / 2}
+            cy={MINI_SIZE / 2}
+            r={miniRadius}
+            strokeWidth={miniStroke}
+            stroke="url(#timerGradMini)"
+            strokeDasharray={miniCirc}
+            strokeDashoffset={miniDashOffset}
+          />
+        </svg>
+        <div
+          className={`timer-mini-time ${overtime ? "overtime" : ""} ${isDanger && !overtime ? "danger-pulse" : ""}`}
+        >
+          {overtime && <span className="overtime-prefix-mini">+</span>}
+          {pad(minutes)}:{pad(seconds)}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="timer-container">
       {isIdle && (
         <div className="timer-setting">
           <label>
-            分
+            {t("timer.minutes")}
             <input
               type="number"
               className="number-input"
@@ -57,7 +116,7 @@ export function Timer({ data, onUpdate }: Props) {
             />
           </label>
           <label>
-            秒
+            {t("timer.seconds")}
             <input
               type="number"
               className="number-input"
@@ -120,18 +179,27 @@ export function Timer({ data, onUpdate }: Props) {
         </div>
       </div>
 
+      <label className="roulette-option">
+        <input
+          type="checkbox"
+          checked={timer.soundEnabled}
+          onChange={(e) => timer.setSoundEnabled(e.target.checked)}
+        />
+        {t("timer.sound")}
+      </label>
+
       <div className="timer-buttons">
         {!running ? (
           <button className="start-button" onClick={start}>
-            スタート
+            {t("timer.start")}
           </button>
         ) : (
           <button className="stop-button" onClick={stop}>
-            ストップ
+            {t("timer.stop")}
           </button>
         )}
         <button className="reset-button" onClick={reset}>
-          リセット
+          {t("common.reset")}
         </button>
       </div>
     </div>

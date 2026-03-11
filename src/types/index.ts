@@ -1,5 +1,6 @@
 export interface DiceData {
   faces: number;
+  count?: number;
 }
 
 export interface RouletteData {
@@ -11,8 +12,14 @@ export interface TimerData {
   seconds: number;
 }
 
+export interface ThemePreset {
+  name: string;
+  items: string[];
+}
+
 export interface ThemeData {
   items: string[];
+  presets?: ThemePreset[];
 }
 
 export interface FaciBoxData {

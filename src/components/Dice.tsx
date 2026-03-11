@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import type { DiceData } from "../types";
+import { useI18n } from "../i18n";
 
 interface Props {
   data: DiceData;
@@ -41,9 +42,11 @@ const PIP_LAYOUTS: Record<number, [number, number][]> = {
 };
 
 export function Dice({ data, onUpdate }: Props) {
-  const [result, setResult] = useState<number | null>(null);
+  const { t } = useI18n();
+  const [results, setResults] = useState<number[]>([]);
   const [rolling, setRolling] = useState(false);
   const [animKey, setAnimKey] = useState(0);
+  const diceCount = data.count ?? 1;
 
   const roll = useCallback(() => {
     if (rolling) return;
@@ -51,25 +54,35 @@ export function Dice({ data, onUpdate }: Props) {
 
     let count = 0;
     const interval = setInterval(() => {
-      setResult(Math.floor(Math.random() * data.faces) + 1);
+      setResults(
+        Array.from(
+          { length: diceCount },
+          () => Math.floor(Math.random() * data.faces) + 1,
+        ),
+      );
       count++;
       if (count >= 12) {
         clearInterval(interval);
-        const final = Math.floor(Math.random() * data.faces) + 1;
-        setResult(final);
+        setResults(
+          Array.from(
+            { length: diceCount },
+            () => Math.floor(Math.random() * data.faces) + 1,
+          ),
+        );
         setRolling(false);
         setAnimKey((k) => k + 1);
       }
     }, 60);
-  }, [rolling, data.faces]);
+  }, [rolling, data.faces, diceCount]);
 
-  const showPips = result !== null && result <= 6 && data.faces <= 6;
+  const showPips = data.faces <= 6;
+  const total = results.reduce((a, b) => a + b, 0);
 
   return (
     <div className="dice-container">
-      <div className="dice-setting">
-        <label>
-          面数
+      <div className="dice-settings-row">
+        <label className="dice-label">
+          {t("dice.faces")}
           <input
             type="number"
             className="number-input"
@@ -78,36 +91,82 @@ export function Dice({ data, onUpdate }: Props) {
             value={data.faces}
             onChange={(e) => {
               const faces = Math.max(2, parseInt(e.target.value) || 2);
-              onUpdate({ faces });
+              onUpdate({ ...data, faces });
+            }}
+          />
+        </label>
+        <label className="dice-label">
+          {t("dice.count")}
+          <input
+            type="number"
+            className="number-input"
+            min={1}
+            max={10}
+            value={diceCount}
+            onChange={(e) => {
+              const c = Math.max(
+                1,
+                Math.min(10, parseInt(e.target.value) || 1),
+              );
+              onUpdate({ ...data, count: c });
             }}
           />
         </label>
       </div>
 
-      <div className={`dice-face ${rolling ? "dice-rolling" : ""}`}>
-        {result !== null ? (
-          showPips ? (
-            <div key={animKey} className="dice-pips">
-              {PIP_LAYOUTS[result].map(([x, y], i) => (
-                <div
-                  key={i}
-                  className="dice-pip"
-                  style={{ left: `${x}%`, top: `${y}%` }}
-                />
-              ))}
+      <div className="dice-results">
+        {results.length > 0 ? (
+          results.map((val, i) => (
+            <div
+              key={`${animKey}-${i}`}
+              className={`dice-face ${rolling ? "dice-rolling" : ""}`}
+              style={{
+                width: diceCount > 4 ? 70 : diceCount > 2 ? 90 : 120,
+                height: diceCount > 4 ? 70 : diceCount > 2 ? 90 : 120,
+              }}
+            >
+              {showPips && val <= 6 ? (
+                <div className="dice-pips">
+                  {PIP_LAYOUTS[val].map(([x, y], j) => (
+                    <div
+                      key={j}
+                      className="dice-pip"
+                      style={{
+                        left: `${x}%`,
+                        top: `${y}%`,
+                        width: diceCount > 4 ? 10 : diceCount > 2 ? 14 : 18,
+                        height: diceCount > 4 ? 10 : diceCount > 2 ? 14 : 18,
+                      }}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <span
+                  className="dice-number"
+                  style={{
+                    fontSize: diceCount > 4 ? 28 : diceCount > 2 ? 36 : 52,
+                  }}
+                >
+                  {val}
+                </span>
+              )}
             </div>
-          ) : (
-            <span key={animKey} className="dice-number">
-              {result}
-            </span>
-          )
+          ))
         ) : (
-          <span className="dice-question">?</span>
+          <div className="dice-face" style={{ width: 120, height: 120 }}>
+            <span className="dice-question">?</span>
+          </div>
         )}
       </div>
 
+      {results.length > 1 && !rolling && (
+        <div className="dice-total">
+          {t("dice.total")}: {total}
+        </div>
+      )}
+
       <button className="primary-button" onClick={roll} disabled={rolling}>
-        {rolling ? "..." : "振る"}
+        {rolling ? t("dice.rolling") : t("dice.roll")}
       </button>
     </div>
   );

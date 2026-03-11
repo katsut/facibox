@@ -11,7 +11,13 @@ export function useTimer({ initialMinutes, initialSeconds }: UseTimerOptions) {
   const [running, setRunning] = useState(false);
   const [overtime, setOvertime] = useState(false);
   const [overtimeSeconds, setOvertimeSeconds] = useState(0);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const soundRef = useRef(true);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    soundRef.current = soundEnabled;
+  }, [soundEnabled]);
 
   useEffect(() => {
     setTotalSeconds(initialMinutes * 60 + initialSeconds);
@@ -34,7 +40,7 @@ export function useTimer({ initialMinutes, initialSeconds }: UseTimerOptions) {
           if (prev <= 1) {
             setOvertime(true);
             setOvertimeSeconds(0);
-            playAlarm();
+            if (soundRef.current) playAlarm();
             return 0;
           }
           return prev - 1;
@@ -61,12 +67,32 @@ export function useTimer({ initialMinutes, initialSeconds }: UseTimerOptions) {
     setTotalSeconds(initialTotal);
   }, [initialTotal]);
 
+  const restart = useCallback(() => {
+    setOvertime(false);
+    setOvertimeSeconds(0);
+    setTotalSeconds(initialTotal);
+    setRunning(true);
+  }, [initialTotal]);
+
   const displaySeconds = overtime ? overtimeSeconds : totalSeconds;
   const minutes = Math.floor(displaySeconds / 60);
   const seconds = displaySeconds % 60;
 
-  return { minutes, seconds, running, overtime, start, stop, reset };
+  return {
+    minutes,
+    seconds,
+    running,
+    overtime,
+    soundEnabled,
+    setSoundEnabled,
+    start,
+    stop,
+    reset,
+    restart,
+  };
 }
+
+export type TimerState = ReturnType<typeof useTimer>;
 
 function playAlarm() {
   const ctx = new AudioContext();
