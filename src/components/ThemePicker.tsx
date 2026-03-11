@@ -129,6 +129,21 @@ export function ThemePicker({ data, onUpdate }: Props) {
       >
         {picking ? "選出中..." : "テーマを決める"}
       </button>
+
+      {data.items.length > 0 && (
+        <button
+          className="reset-all-button"
+          onClick={() => {
+            if (confirm("テーマをすべて削除しますか？")) {
+              onUpdate({ items: [] });
+              setResult(null);
+              setShowList(false);
+            }
+          }}
+        >
+          テーマをすべて削除
+        </button>
+      )}
     </div>
   );
 }

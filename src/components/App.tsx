@@ -16,15 +16,9 @@ interface Props {
 export function App({ visible, onClose }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>("dice");
   const [collapsed, setCollapsed] = useState(false);
-  const { data, loaded, update, reset } = useStorage();
+  const { data, loaded, update } = useStorage();
 
   if (!loaded) return null;
-
-  const handleReset = () => {
-    if (confirm("すべてのデータをリセットしますか？")) {
-      reset();
-    }
-  };
 
   return (
     <Modal
@@ -54,9 +48,6 @@ export function App({ visible, onClose }: Props) {
           />
         )}
       </div>
-      <button className="reset-all-button" onClick={handleReset}>
-        データをリセット
-      </button>
     </Modal>
   );
 }

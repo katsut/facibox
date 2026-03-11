@@ -186,6 +186,21 @@ export function Roulette({ data, onUpdate }: Props) {
           )}
         </div>
       )}
+
+      {count > 0 && (
+        <button
+          className="reset-all-button"
+          onClick={() => {
+            if (confirm("ルーレットの項目をすべて削除しますか？")) {
+              onUpdate({ items: [] });
+              setResult(null);
+              setResultIdx(null);
+            }
+          }}
+        >
+          項目をすべて削除
+        </button>
+      )}
     </div>
   );
 }
