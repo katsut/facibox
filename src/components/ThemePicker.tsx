@@ -10,8 +10,8 @@ export function ThemePicker({ data, onUpdate }: Props) {
   const [input, setInput] = useState("");
   const [result, setResult] = useState<string | null>(null);
   const [picking, setPicking] = useState(false);
-  const [shuffleDisplay, setShuffleDisplay] = useState("");
-  const [highlightIdx, setHighlightIdx] = useState<number | null>(null);
+  const [shuffling, setShuffling] = useState(false);
+  const [showList, setShowList] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const addItem = () => {
@@ -28,33 +28,29 @@ export function ThemePicker({ data, onUpdate }: Props) {
   const pick = () => {
     if (data.items.length === 0 || picking) return;
     setPicking(true);
+    setShuffling(true);
     setResult(null);
-    setHighlightIdx(null);
 
-    let delay = 50;
-    let step = 0;
-    const totalSteps = 15;
+    setTimeout(() => {
+      setShuffling(false);
+      const finalIdx = Math.floor(Math.random() * data.items.length);
 
-    const tick = () => {
-      const idx = Math.floor(Math.random() * data.items.length);
-      setShuffleDisplay(data.items[idx]);
-      step++;
-
-      if (step >= totalSteps) {
-        const finalIdx = Math.floor(Math.random() * data.items.length);
-        setShuffleDisplay("");
-        setResult(data.items[finalIdx]);
-        setHighlightIdx(finalIdx);
-        setPicking(false);
-        return;
-      }
-
-      delay += step * 12;
-      timeoutRef.current = setTimeout(tick, delay);
-    };
-
-    tick();
+      let reveal = 0;
+      const revealTick = () => {
+        reveal++;
+        if (reveal >= 6) {
+          setResult(data.items[finalIdx]);
+          setPicking(false);
+          return;
+        }
+        setResult(data.items[Math.floor(Math.random() * data.items.length)]);
+        timeoutRef.current = setTimeout(revealTick, 100 + reveal * 40);
+      };
+      revealTick();
+    }, 800);
   };
+
+  const cardCount = Math.min(data.items.length, 5);
 
   return (
     <div className="list-container">
@@ -73,10 +69,49 @@ export function ThemePicker({ data, onUpdate }: Props) {
           追加
         </button>
       </div>
+
       {data.items.length > 0 && (
+        <div className="card-deck-area">
+          <div className={`card-deck ${shuffling ? "card-shuffling" : ""}`}>
+            {Array.from({ length: cardCount }).map((_, i) => (
+              <div
+                key={i}
+                className="card-back"
+                style={{
+                  transform: `translateX(${(i - Math.floor(cardCount / 2)) * 6}px) rotate(${(i - Math.floor(cardCount / 2)) * 3}deg)`,
+                  zIndex: cardCount - i,
+                }}
+              >
+                <span className="card-back-icon">?</span>
+              </div>
+            ))}
+          </div>
+          {result !== null && !picking && (
+            <div className="card-reveal">
+              <div className="card-front">
+                <span className="card-front-text">{result}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="theme-meta">
+        <span className="theme-count">{data.items.length} 件登録済み</span>
+        {data.items.length > 0 && (
+          <button
+            className="theme-toggle-list"
+            onClick={() => setShowList(!showList)}
+          >
+            {showList ? "一覧を隠す" : "一覧を表示"}
+          </button>
+        )}
+      </div>
+
+      {showList && data.items.length > 0 && (
         <ul className="item-list">
           {data.items.map((item, i) => (
-            <li key={i} className={highlightIdx === i ? "highlighted" : ""}>
+            <li key={i}>
               <span>{item}</span>
               <button className="remove-button" onClick={() => removeItem(i)}>
                 ✕
@@ -85,7 +120,7 @@ export function ThemePicker({ data, onUpdate }: Props) {
           ))}
         </ul>
       )}
-      {picking && <div className="spin-overlay">{shuffleDisplay}</div>}
+
       <button
         className="primary-button"
         onClick={pick}
@@ -94,9 +129,6 @@ export function ThemePicker({ data, onUpdate }: Props) {
       >
         {picking ? "選出中..." : "テーマを決める"}
       </button>
-      {result !== null && !picking && (
-        <div className="result-display-sm">{result}</div>
-      )}
     </div>
   );
 }

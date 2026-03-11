@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import type { RouletteData } from "../types";
 
 interface Props {
@@ -6,13 +6,26 @@ interface Props {
   onUpdate: (data: RouletteData) => void;
 }
 
+const COLORS = [
+  "#4f6df5",
+  "#f59e0b",
+  "#10b981",
+  "#ef4444",
+  "#8b5cf6",
+  "#ec4899",
+  "#06b6d4",
+  "#f97316",
+  "#6366f1",
+  "#14b8a6",
+];
+
 export function Roulette({ data, onUpdate }: Props) {
   const [input, setInput] = useState("");
   const [result, setResult] = useState<string | null>(null);
+  const [resultIdx, setResultIdx] = useState<number | null>(null);
   const [spinning, setSpinning] = useState(false);
-  const [spinDisplay, setSpinDisplay] = useState("");
-  const [highlightIdx, setHighlightIdx] = useState<number | null>(null);
-  const spinRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [rotation, setRotation] = useState(0);
+  const wheelRef = useRef<HTMLDivElement>(null);
 
   const addItem = () => {
     const trimmed = input.trim();
@@ -21,40 +34,41 @@ export function Roulette({ data, onUpdate }: Props) {
     setInput("");
   };
 
-  const removeItem = (index: number) => {
-    onUpdate({ items: data.items.filter((_, i) => i !== index) });
-  };
+  const removeItem = useCallback(
+    (index: number) => {
+      onUpdate({ items: data.items.filter((_, i) => i !== index) });
+      if (resultIdx === index) {
+        setResult(null);
+        setResultIdx(null);
+      }
+    },
+    [data.items, onUpdate, resultIdx],
+  );
 
   const spin = () => {
     if (data.items.length === 0 || spinning) return;
     setSpinning(true);
     setResult(null);
-    setHighlightIdx(null);
+    setResultIdx(null);
 
-    let delay = 50;
-    let step = 0;
-    const totalSteps = 20;
+    const winIdx = Math.floor(Math.random() * data.items.length);
+    const segAngle = 360 / data.items.length;
+    const targetAngle = 360 - winIdx * segAngle - segAngle / 2;
+    const spins = 5 + Math.random() * 3;
+    const finalRotation =
+      rotation + spins * 360 + targetAngle - (rotation % 360);
 
-    const tick = () => {
-      const idx = Math.floor(Math.random() * data.items.length);
-      setSpinDisplay(data.items[idx]);
-      step++;
+    setRotation(finalRotation);
 
-      if (step >= totalSteps) {
-        const finalIdx = Math.floor(Math.random() * data.items.length);
-        setSpinDisplay("");
-        setResult(data.items[finalIdx]);
-        setHighlightIdx(finalIdx);
-        setSpinning(false);
-        return;
-      }
-
-      delay += step * 8;
-      spinRef.current = setTimeout(tick, delay);
-    };
-
-    tick();
+    setTimeout(() => {
+      setResult(data.items[winIdx]);
+      setResultIdx(winIdx);
+      setSpinning(false);
+    }, 4000);
   };
+
+  const count = data.items.length;
+  const segAngle = count > 0 ? 360 / count : 360;
 
   return (
     <div className="list-container">
@@ -73,37 +87,98 @@ export function Roulette({ data, onUpdate }: Props) {
           追加
         </button>
       </div>
-      {data.items.length > 0 && (
-        <ul className="item-list">
+
+      {count > 0 && (
+        <div className="wheel-wrapper">
+          <div className="wheel-pointer" />
+          <div
+            ref={wheelRef}
+            className="wheel"
+            style={{
+              transform: `rotate(${rotation}deg)`,
+              transition: spinning
+                ? "transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)"
+                : "none",
+            }}
+          >
+            {data.items.map((item, i) => {
+              const startAngle = i * segAngle;
+              const color = COLORS[i % COLORS.length];
+              return (
+                <div
+                  key={i}
+                  className="wheel-segment"
+                  style={{
+                    transform: `rotate(${startAngle}deg)`,
+                    clipPath:
+                      count === 1
+                        ? "none"
+                        : `polygon(50% 50%, 50% 0%, ${50 + 50 * Math.tan(((segAngle / 2) * Math.PI) / 180)}% 0%)`,
+                  }}
+                >
+                  <div
+                    className="wheel-segment-fill"
+                    style={{
+                      background: color,
+                      transform:
+                        count === 1 ? "none" : `rotate(${segAngle / 2}deg)`,
+                      clipPath:
+                        count === 1
+                          ? "none"
+                          : `polygon(50% 50%, 50% 0%, ${50 - 50 * Math.tan(((segAngle / 2) * Math.PI) / 180)}% 0%)`,
+                    }}
+                  />
+                  <span
+                    className="wheel-label"
+                    style={{
+                      transform: `rotate(${segAngle / 2}deg) translateY(-55px)`,
+                    }}
+                  >
+                    {item.length > 6 ? item.slice(0, 6) + "…" : item}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {count > 0 && (
+        <div className="wheel-items-compact">
           {data.items.map((item, i) => (
-            <li key={i} className={highlightIdx === i ? "highlighted" : ""}>
-              <span>{item}</span>
+            <span key={i} className="wheel-item-tag">
+              <span
+                className="wheel-item-dot"
+                style={{ background: COLORS[i % COLORS.length] }}
+              />
+              {item}
               <button className="remove-button" onClick={() => removeItem(i)}>
                 ✕
               </button>
-            </li>
+            </span>
           ))}
-        </ul>
+        </div>
       )}
-      {spinning && <div className="spin-overlay">{spinDisplay}</div>}
+
       <button
         className="primary-button"
         onClick={spin}
-        disabled={data.items.length === 0 || spinning}
+        disabled={count === 0 || spinning}
         style={{ padding: "12px" }}
       >
         {spinning ? "選出中..." : "回す"}
       </button>
+
       {result !== null && !spinning && (
         <div className="result-area">
           <div className="result-display-sm">{result}</div>
-          {highlightIdx !== null && (
+          {resultIdx !== null && (
             <button
               className="remove-result-button"
               onClick={() => {
-                removeItem(highlightIdx);
+                removeItem(resultIdx);
                 setResult(null);
-                setHighlightIdx(null);
+                setResultIdx(null);
               }}
             >
               この項目を除外する

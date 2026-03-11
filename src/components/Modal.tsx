@@ -2,11 +2,19 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 interface Props {
   visible: boolean;
+  collapsed: boolean;
   onClose: () => void;
+  onToggleCollapse: () => void;
   children: React.ReactNode;
 }
 
-export function Modal({ visible, onClose, children }: Props) {
+export function Modal({
+  visible,
+  collapsed,
+  onClose,
+  onToggleCollapse,
+  children,
+}: Props) {
   const modalRef = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
@@ -14,7 +22,7 @@ export function Modal({ visible, onClose, children }: Props) {
 
   useEffect(() => {
     if (visible) {
-      setPos({ x: window.innerWidth - 420, y: 20 });
+      setPos({ x: window.innerWidth - 440, y: 20 });
     }
   }, [visible]);
 
@@ -51,17 +59,24 @@ export function Modal({ visible, onClose, children }: Props) {
     <div className="overlay" onClick={onClose}>
       <div
         ref={modalRef}
-        className="modal"
+        className={`modal ${collapsed ? "collapsed" : ""}`}
         style={{ left: pos.x, top: pos.y }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header" onMouseDown={onMouseDown}>
           <span className="modal-title">FaciBox</span>
-          <button className="modal-close" onClick={onClose}>
-            ✕
-          </button>
+          <div className="modal-header-actions">
+            <button className="modal-collapse" onClick={onToggleCollapse}>
+              {collapsed ? "▼" : "▲"}
+            </button>
+            <button className="modal-close" onClick={onClose}>
+              ✕
+            </button>
+          </div>
         </div>
-        <div className="modal-body">{children}</div>
+        <div className={`modal-body ${collapsed ? "hidden" : ""}`}>
+          {children}
+        </div>
       </div>
     </div>
   );

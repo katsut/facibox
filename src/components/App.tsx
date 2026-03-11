@@ -15,6 +15,7 @@ interface Props {
 
 export function App({ visible, onClose }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>("dice");
+  const [collapsed, setCollapsed] = useState(false);
   const { data, loaded, update, reset } = useStorage();
 
   if (!loaded) return null;
@@ -26,7 +27,12 @@ export function App({ visible, onClose }: Props) {
   };
 
   return (
-    <Modal visible={visible} onClose={onClose}>
+    <Modal
+      visible={visible}
+      collapsed={collapsed}
+      onClose={onClose}
+      onToggleCollapse={() => setCollapsed((c) => !c)}
+    >
       <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
       <div className="tab-content">
         {activeTab === "dice" && (

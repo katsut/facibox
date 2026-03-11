@@ -6,8 +6,10 @@ interface Props {
   onUpdate: (data: TimerData) => void;
 }
 
-const RING_RADIUS = 78;
-const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+const SIZE = 200;
+const STROKE = 8;
+const RADIUS = (SIZE - STROKE) / 2;
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 export function Timer({ data, onUpdate }: Props) {
   const { minutes, seconds, running, overtime, start, stop, reset } = useTimer({
@@ -21,19 +23,17 @@ export function Timer({ data, onUpdate }: Props) {
   const currentTotal = minutes * 60 + seconds;
 
   let progress: number;
-  let dashOffset: number;
   let isDanger: boolean;
 
   if (overtime) {
     progress = 1;
-    dashOffset = 0;
     isDanger = true;
   } else {
     progress = initialTotal > 0 ? currentTotal / initialTotal : 0;
-    dashOffset = RING_CIRCUMFERENCE * (1 - progress);
     isDanger = running && currentTotal <= 10 && currentTotal > 0;
   }
 
+  const dashOffset = CIRCUMFERENCE * (1 - progress);
   const isIdle = !running && !overtime;
 
   return (
@@ -77,28 +77,49 @@ export function Timer({ data, onUpdate }: Props) {
           </label>
         </div>
       )}
-      <div className="timer-ring-wrapper">
+
+      <div className={`timer-ring-wrapper ${overtime ? "timer-overtime" : ""}`}>
         <svg
           className="timer-ring"
-          width="180"
-          height="180"
-          viewBox="0 0 180 180"
+          width={SIZE}
+          height={SIZE}
+          viewBox={`0 0 ${SIZE} ${SIZE}`}
         >
-          <circle className="timer-ring-bg" cx="90" cy="90" r={RING_RADIUS} />
+          <defs>
+            <linearGradient id="timerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor={isDanger ? "#ef4444" : "#4f6df5"} />
+              <stop
+                offset="100%"
+                stopColor={isDanger ? "#f97316" : "#818cf8"}
+              />
+            </linearGradient>
+          </defs>
           <circle
-            className={`timer-ring-progress ${isDanger ? "danger" : ""}`}
-            cx="90"
-            cy="90"
-            r={RING_RADIUS}
-            strokeDasharray={RING_CIRCUMFERENCE}
+            className="timer-ring-bg"
+            cx={SIZE / 2}
+            cy={SIZE / 2}
+            r={RADIUS}
+            strokeWidth={STROKE}
+          />
+          <circle
+            className="timer-ring-progress"
+            cx={SIZE / 2}
+            cy={SIZE / 2}
+            r={RADIUS}
+            strokeWidth={STROKE}
+            stroke="url(#timerGrad)"
+            strokeDasharray={CIRCUMFERENCE}
             strokeDashoffset={dashOffset}
           />
         </svg>
-        <div className={`timer-time ${overtime ? "overtime" : ""}`}>
+        <div
+          className={`timer-time ${overtime ? "overtime" : ""} ${isDanger && !overtime ? "danger-pulse" : ""}`}
+        >
           {overtime && <span className="overtime-prefix">+</span>}
           {pad(minutes)}:{pad(seconds)}
         </div>
       </div>
+
       <div className="timer-buttons">
         {!running ? (
           <button className="start-button" onClick={start}>

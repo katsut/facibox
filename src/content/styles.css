@@ -25,7 +25,6 @@
   --fb-border: #e4e4e7;
   --fb-text: #18181b;
   --fb-text-muted: #71717a;
-  --fb-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   --fb-radius: 12px;
 }
 
@@ -47,10 +46,10 @@
     opacity: 0;
   }
   50% {
-    transform: scale(1.15);
+    transform: scale(1.12);
   }
   70% {
-    transform: scale(0.95);
+    transform: scale(0.96);
   }
   100% {
     transform: scale(1);
@@ -58,52 +57,49 @@
   }
 }
 
-@keyframes shake {
-  0%,
-  100% {
-    transform: rotate(0deg);
+@keyframes dice-tumble {
+  0% {
+    transform: perspective(300px) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
   }
-  10% {
-    transform: rotate(-12deg) scale(1.1);
-  }
-  20% {
-    transform: rotate(12deg) scale(1.1);
-  }
-  30% {
-    transform: rotate(-10deg);
-  }
-  40% {
-    transform: rotate(10deg);
+  25% {
+    transform: perspective(300px) rotateX(90deg) rotateY(45deg) rotateZ(30deg);
   }
   50% {
-    transform: rotate(-6deg);
+    transform: perspective(300px) rotateX(180deg) rotateY(90deg) rotateZ(60deg);
   }
-  60% {
-    transform: rotate(6deg);
+  75% {
+    transform: perspective(300px) rotateX(270deg) rotateY(135deg) rotateZ(90deg);
   }
-  70% {
-    transform: rotate(-3deg);
-  }
-  80% {
-    transform: rotate(3deg);
+  100% {
+    transform: perspective(300px) rotateX(360deg) rotateY(180deg) rotateZ(0deg);
   }
 }
 
-@keyframes spin-slot {
+@keyframes card-shuffle {
   0% {
-    transform: translateY(0);
-    opacity: 1;
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(20px) rotate(8deg);
   }
   50% {
-    transform: translateY(-20px);
-    opacity: 0;
+    transform: translateX(-20px) rotate(-8deg);
   }
-  51% {
-    transform: translateY(20px);
+  75% {
+    transform: translateX(10px) rotate(4deg);
+  }
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+}
+
+@keyframes card-flip-in {
+  0% {
+    transform: perspective(600px) rotateY(180deg) scale(0.8);
     opacity: 0;
   }
   100% {
-    transform: translateY(0);
+    transform: perspective(600px) rotateY(0deg) scale(1);
     opacity: 1;
   }
 }
@@ -131,16 +127,13 @@
   }
 }
 
-@keyframes highlight-pick {
-  0% {
-    background: var(--fb-primary);
-    color: #fff;
-    transform: scale(1.03);
-  }
+@keyframes danger-text-pulse {
+  0%,
   100% {
-    background: var(--fb-hover);
-    color: var(--fb-text);
-    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
   }
 }
 
@@ -155,13 +148,12 @@
 .modal {
   position: fixed;
   width: 400px;
-  max-height: 540px;
   display: flex;
   flex-direction: column;
   background: var(--fb-surface);
   border: 1px solid var(--fb-border);
   border-radius: var(--fb-radius);
-  box-shadow: var(--fb-shadow);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow: hidden;
@@ -169,11 +161,15 @@
   animation: modal-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.modal.collapsed {
+  max-height: none;
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px;
+  padding: 12px 16px;
   background: linear-gradient(
     135deg,
     var(--fb-primary),
@@ -181,6 +177,7 @@
   );
   cursor: grab;
   user-select: none;
+  flex-shrink: 0;
 }
 
 .modal-header:active {
@@ -194,6 +191,12 @@
   letter-spacing: 0.5px;
 }
 
+.modal-header-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.modal-collapse,
 .modal-close {
   border: none;
   background: rgba(255, 255, 255, 0.15);
@@ -203,8 +206,10 @@
   padding: 4px 8px;
   border-radius: 6px;
   transition: background 0.15s;
+  line-height: 1;
 }
 
+.modal-collapse:hover,
 .modal-close:hover {
   background: rgba(255, 255, 255, 0.3);
   color: #fff;
@@ -214,6 +219,11 @@
   flex: 1;
   overflow-y: auto;
   padding: 0 16px 16px;
+  max-height: 480px;
+}
+
+.modal-body.hidden {
+  display: none;
 }
 
 /* === Tab Nav === */
@@ -255,7 +265,7 @@
   animation: fade-up 0.2s ease;
 }
 
-/* === Common === */
+/* === Common Inputs === */
 .text-input {
   flex: 1;
   padding: 10px 12px;
@@ -295,6 +305,7 @@
   box-shadow: 0 0 0 3px var(--fb-primary-bg);
 }
 
+/* === Buttons === */
 .primary-button {
   padding: 12px 48px;
   border: none;
@@ -321,7 +332,6 @@
 
 .primary-button:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(79, 109, 245, 0.3);
 }
 
 .primary-button:disabled {
@@ -347,12 +357,22 @@
   color: var(--fb-primary);
 }
 
-/* === Result area === */
+/* === Result === */
 .result-area {
   display: flex;
   flex-direction: column;
   gap: 8px;
   animation: bounce-in 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.result-display-sm {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--fb-primary);
+  text-align: center;
+  padding: 12px 16px;
+  background: var(--fb-primary-bg);
+  border-radius: 10px;
 }
 
 .remove-result-button {
@@ -371,28 +391,9 @@
   color: #fff;
 }
 
-/* === Result displays === */
-.result-display {
-  font-size: 80px;
-  font-weight: 800;
-  color: var(--fb-primary);
-  line-height: 1;
-  text-align: center;
-  animation: bounce-in 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.result-display-sm {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--fb-primary);
-  text-align: center;
-  padding: 12px 16px;
-  background: var(--fb-primary-bg);
-  border-radius: 10px;
-  animation: bounce-in 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* === Dice === */
+/* ===================== */
+/* === DICE          === */
+/* ===================== */
 .dice-container {
   display: flex;
   flex-direction: column;
@@ -414,37 +415,59 @@
   color: var(--fb-text);
 }
 
-.dice-visual {
-  width: 100px;
-  height: 100px;
+.dice-face {
+  width: 120px;
+  height: 120px;
   background: linear-gradient(145deg, #ffffff, #f0f0f3);
-  border: 2px solid var(--fb-border);
-  border-radius: 16px;
+  border: 3px solid var(--fb-border);
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
   box-shadow:
-    4px 4px 12px rgba(0, 0, 0, 0.08),
-    -2px -2px 8px rgba(255, 255, 255, 0.9);
+    6px 6px 16px rgba(0, 0, 0, 0.1),
+    -3px -3px 10px rgba(255, 255, 255, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: transform 0.3s;
 }
 
-.dice-visual.rolling {
-  animation: shake 0.5s ease-in-out;
+.dice-rolling {
+  animation: dice-tumble 0.6s ease-in-out;
 }
 
-.dice-visual .dice-value {
-  font-size: 48px;
+.dice-pips {
+  position: absolute;
+  inset: 12px;
+  animation: bounce-in 0.3s ease;
+}
+
+.dice-pip {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: radial-gradient(circle at 30% 30%, #555, #18181b);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dice-number {
+  font-size: 52px;
   font-weight: 800;
   color: var(--fb-primary);
-  animation: bounce-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: bounce-in 0.3s ease;
 }
 
-.dice-visual .dice-placeholder {
-  font-size: 32px;
+.dice-question {
+  font-size: 40px;
+  font-weight: 700;
   color: var(--fb-border);
 }
 
-/* === List (Roulette / Theme) === */
+/* ===================== */
+/* === ROULETTE      === */
+/* ===================== */
 .list-container {
   display: flex;
   flex-direction: column;
@@ -456,11 +479,117 @@
   gap: 8px;
 }
 
+/* Wheel */
+.wheel-wrapper {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  margin: 0 auto;
+}
+
+.wheel-pointer {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 18px solid var(--fb-text);
+  z-index: 10;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.wheel {
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  border: 4px solid var(--fb-text);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.15),
+    inset 0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+.wheel-segment {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-origin: center;
+}
+
+.wheel-segment-fill {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-origin: center;
+  opacity: 0.85;
+}
+
+.wheel-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.wheel-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  margin: -15px;
+  background: var(--fb-surface);
+  border-radius: 50%;
+  border: 3px solid var(--fb-text);
+  z-index: 5;
+}
+
+/* Compact item tags */
+.wheel-items-compact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.wheel-item-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--fb-hover);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--fb-text);
+}
+
+.wheel-item-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.wheel-item-tag .remove-button {
+  font-size: 10px;
+  padding: 0 2px;
+}
+
+/* Item list */
 .item-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  max-height: 160px;
+  max-height: 140px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -484,10 +613,6 @@
   background: var(--fb-primary-bg);
 }
 
-.item-list li.highlighted {
-  animation: highlight-pick 1.5s ease forwards;
-}
-
 .remove-button {
   border: none;
   background: none;
@@ -504,20 +629,9 @@
   background: rgba(229, 72, 77, 0.1);
 }
 
-/* === Roulette spinning overlay === */
-.spin-overlay {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--fb-primary);
-  min-height: 60px;
-  animation: spin-slot 0.12s linear infinite;
-}
-
-/* === Timer === */
+/* ===================== */
+/* === TIMER         === */
+/* ===================== */
 .timer-container {
   display: flex;
   flex-direction: column;
@@ -541,8 +655,13 @@
 
 .timer-ring-wrapper {
   position: relative;
-  width: 180px;
-  height: 180px;
+  width: 200px;
+  height: 200px;
+}
+
+.timer-overtime {
+  animation: pulse-ring 2s infinite;
+  border-radius: 50%;
 }
 
 .timer-ring {
@@ -552,21 +671,14 @@
 .timer-ring-bg {
   fill: none;
   stroke: var(--fb-hover);
-  stroke-width: 6;
 }
 
 .timer-ring-progress {
   fill: none;
-  stroke: var(--fb-primary);
-  stroke-width: 6;
   stroke-linecap: round;
   transition:
     stroke-dashoffset 1s linear,
-    stroke 0.3s;
-}
-
-.timer-ring-progress.danger {
-  stroke: var(--fb-danger);
+    stroke 0.5s;
 }
 
 .timer-time {
@@ -575,7 +687,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 48px;
+  font-size: 44px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--fb-text);
@@ -583,12 +695,15 @@
 
 .timer-time.overtime {
   color: var(--fb-danger);
-  animation: pulse-ring 1.5s infinite;
-  border-radius: 50%;
+}
+
+.timer-time.danger-pulse {
+  animation: danger-text-pulse 1s infinite;
+  color: var(--fb-danger);
 }
 
 .overtime-prefix {
-  font-size: 32px;
+  font-size: 28px;
   margin-right: 2px;
 }
 
@@ -630,9 +745,7 @@
   cursor: pointer;
   background: linear-gradient(135deg, var(--fb-danger), #f76b6e);
   color: #fff;
-  transition:
-    transform 0.15s,
-    box-shadow 0.15s;
+  transition: transform 0.15s;
   box-shadow: 0 2px 8px rgba(229, 72, 77, 0.3);
 }
 
@@ -655,6 +768,109 @@
 .reset-button:hover {
   background: var(--fb-hover);
   border-color: var(--fb-text-muted);
+}
+
+/* ===================== */
+/* === THEME PICKER  === */
+/* ===================== */
+.card-deck-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  min-height: 140px;
+}
+
+.card-deck {
+  position: relative;
+  width: 100px;
+  height: 130px;
+}
+
+.card-shuffling {
+  animation: card-shuffle 0.8s ease-in-out;
+}
+
+.card-back {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--fb-primary), #3b4cc0);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  transition: transform 0.3s;
+}
+
+.card-back::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+}
+
+.card-back-icon {
+  font-size: 32px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.card-reveal {
+  animation: card-flip-in 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-front {
+  width: 220px;
+  min-height: 80px;
+  background: linear-gradient(145deg, #ffffff, #f8f9ff);
+  border: 2px solid var(--fb-primary);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 20px;
+  box-shadow:
+    0 4px 20px rgba(79, 109, 245, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.card-front-text {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--fb-primary);
+  text-align: center;
+  word-break: break-word;
+}
+
+/* Theme meta */
+.theme-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.theme-count {
+  font-size: 12px;
+  color: var(--fb-text-muted);
+}
+
+.theme-toggle-list {
+  border: none;
+  background: none;
+  color: var(--fb-primary);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.theme-toggle-list:hover {
+  background: var(--fb-primary-bg);
 }
 
 /* === Reset All === */

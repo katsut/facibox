@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import type { DiceData } from "../types";
 
 interface Props {
@@ -6,12 +6,46 @@ interface Props {
   onUpdate: (data: DiceData) => void;
 }
 
+const PIP_LAYOUTS: Record<number, [number, number][]> = {
+  1: [[50, 50]],
+  2: [
+    [25, 25],
+    [75, 75],
+  ],
+  3: [
+    [25, 25],
+    [50, 50],
+    [75, 75],
+  ],
+  4: [
+    [25, 25],
+    [75, 25],
+    [25, 75],
+    [75, 75],
+  ],
+  5: [
+    [25, 25],
+    [75, 25],
+    [50, 50],
+    [25, 75],
+    [75, 75],
+  ],
+  6: [
+    [25, 25],
+    [75, 25],
+    [25, 50],
+    [75, 50],
+    [25, 75],
+    [75, 75],
+  ],
+};
+
 export function Dice({ data, onUpdate }: Props) {
   const [result, setResult] = useState<number | null>(null);
   const [rolling, setRolling] = useState(false);
-  const [key, setKey] = useState(0);
+  const [animKey, setAnimKey] = useState(0);
 
-  const roll = () => {
+  const roll = useCallback(() => {
     if (rolling) return;
     setRolling(true);
 
@@ -19,14 +53,17 @@ export function Dice({ data, onUpdate }: Props) {
     const interval = setInterval(() => {
       setResult(Math.floor(Math.random() * data.faces) + 1);
       count++;
-      if (count >= 10) {
+      if (count >= 12) {
         clearInterval(interval);
-        setResult(Math.floor(Math.random() * data.faces) + 1);
+        const final = Math.floor(Math.random() * data.faces) + 1;
+        setResult(final);
         setRolling(false);
-        setKey((k) => k + 1);
+        setAnimKey((k) => k + 1);
       }
     }, 60);
-  };
+  }, [rolling, data.faces]);
+
+  const showPips = result !== null && result <= 6 && data.faces <= 6;
 
   return (
     <div className="dice-container">
@@ -46,15 +83,29 @@ export function Dice({ data, onUpdate }: Props) {
           />
         </label>
       </div>
-      <div className={`dice-visual ${rolling ? "rolling" : ""}`}>
+
+      <div className={`dice-face ${rolling ? "dice-rolling" : ""}`}>
         {result !== null ? (
-          <span key={key} className="dice-value">
-            {result}
-          </span>
+          showPips ? (
+            <div key={animKey} className="dice-pips">
+              {PIP_LAYOUTS[result].map(([x, y], i) => (
+                <div
+                  key={i}
+                  className="dice-pip"
+                  style={{ left: `${x}%`, top: `${y}%` }}
+                />
+              ))}
+            </div>
+          ) : (
+            <span key={animKey} className="dice-number">
+              {result}
+            </span>
+          )
         ) : (
-          <span className="dice-placeholder">?</span>
+          <span className="dice-question">?</span>
         )}
       </div>
+
       <button className="primary-button" onClick={roll} disabled={rolling}>
         {rolling ? "..." : "振る"}
       </button>
