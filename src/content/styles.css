@@ -347,6 +347,30 @@
   color: var(--fb-primary);
 }
 
+/* === Result area === */
+.result-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: bounce-in 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.remove-result-button {
+  padding: 6px 12px;
+  border: 1px solid var(--fb-danger);
+  border-radius: 8px;
+  background: rgba(229, 72, 77, 0.06);
+  color: var(--fb-danger);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.remove-result-button:hover {
+  background: var(--fb-danger);
+  color: #fff;
+}
+
 /* === Result displays === */
 .result-display {
   font-size: 80px;
@@ -557,10 +581,15 @@
   color: var(--fb-text);
 }
 
-.timer-time.finished {
+.timer-time.overtime {
   color: var(--fb-danger);
   animation: pulse-ring 1.5s infinite;
   border-radius: 50%;
+}
+
+.overtime-prefix {
+  font-size: 32px;
+  margin-right: 2px;
 }
 
 .timer-buttons {

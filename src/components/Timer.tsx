@@ -10,7 +10,7 @@ const RING_RADIUS = 78;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
 export function Timer({ data, onUpdate }: Props) {
-  const { minutes, seconds, running, finished, start, stop, reset } = useTimer({
+  const { minutes, seconds, running, overtime, start, stop, reset } = useTimer({
     initialMinutes: data.minutes,
     initialSeconds: data.seconds,
   });
@@ -19,13 +19,26 @@ export function Timer({ data, onUpdate }: Props) {
 
   const initialTotal = data.minutes * 60 + data.seconds;
   const currentTotal = minutes * 60 + seconds;
-  const progress = initialTotal > 0 ? currentTotal / initialTotal : 0;
-  const dashOffset = RING_CIRCUMFERENCE * (1 - progress);
-  const isDanger = running && currentTotal <= 10 && currentTotal > 0;
+
+  let progress: number;
+  let dashOffset: number;
+  let isDanger: boolean;
+
+  if (overtime) {
+    progress = 1;
+    dashOffset = 0;
+    isDanger = true;
+  } else {
+    progress = initialTotal > 0 ? currentTotal / initialTotal : 0;
+    dashOffset = RING_CIRCUMFERENCE * (1 - progress);
+    isDanger = running && currentTotal <= 10 && currentTotal > 0;
+  }
+
+  const isIdle = !running && !overtime;
 
   return (
     <div className="timer-container">
-      {!running && !finished && (
+      {isIdle && (
         <div className="timer-setting">
           <label>
             分
@@ -81,7 +94,8 @@ export function Timer({ data, onUpdate }: Props) {
             strokeDashoffset={dashOffset}
           />
         </svg>
-        <div className={`timer-time ${finished ? "finished" : ""}`}>
+        <div className={`timer-time ${overtime ? "overtime" : ""}`}>
+          {overtime && <span className="overtime-prefix">+</span>}
           {pad(minutes)}:{pad(seconds)}
         </div>
       </div>

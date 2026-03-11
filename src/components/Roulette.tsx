@@ -95,7 +95,21 @@ export function Roulette({ data, onUpdate }: Props) {
         {spinning ? "選出中..." : "回す"}
       </button>
       {result !== null && !spinning && (
-        <div className="result-display-sm">{result}</div>
+        <div className="result-area">
+          <div className="result-display-sm">{result}</div>
+          {highlightIdx !== null && (
+            <button
+              className="remove-result-button"
+              onClick={() => {
+                removeItem(highlightIdx);
+                setResult(null);
+                setHighlightIdx(null);
+              }}
+            >
+              この項目を除外する
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
