@@ -1,8 +1,16 @@
 # FaciBox
 
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/plgjjiajhegekckmccfgnhddgidffhoh?label=Chrome%20Web%20Store)](https://chromewebstore.google.com/detail/facibox/plgjjiajhegekckmccfgnhddgidffhoh)
+
 Workshop and meeting facilitation toolkit as a Chrome Extension.
 
 ワークショップやミーティングで使えるファシリテーションツールの Chrome 拡張機能です。
+
+## Install / インストール
+
+Available on the [Chrome Web Store](https://chromewebstore.google.com/detail/facibox/plgjjiajhegekckmccfgnhddgidffhoh).
+
+[Chrome ウェブストア](https://chromewebstore.google.com/detail/facibox/plgjjiajhegekckmccfgnhddgidffhoh)からインストールできます。
 
 ## Features / 機能
 
