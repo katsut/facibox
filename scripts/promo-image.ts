@@ -122,7 +122,7 @@ async function main() {
   const browser = await chromium.launch();
   const page = await browser.newPage({
     viewport: { width: 440, height: 280 },
-    deviceScaleFactor: 2,
+    deviceScaleFactor: 1,
   });
 
   await page.setContent(html);
