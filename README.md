@@ -46,6 +46,10 @@ Load `dist/` as an unpacked extension in `chrome://extensions`.
 pnpm build
 ```
 
+## Release
+
+See [RELEASE.md](RELEASE.md) for the Chrome Web Store release procedure.
+
 ## License
 
 MIT
