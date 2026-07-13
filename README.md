@@ -4,20 +4,16 @@
 
 Workshop and meeting facilitation toolkit as a Chrome Extension.
 
-ワークショップやミーティングで使えるファシリテーションツールの Chrome 拡張機能です。
-
-## Install / インストール
+## Install
 
 Available on the [Chrome Web Store](https://chromewebstore.google.com/detail/facibox/plgjjiajhegekckmccfgnhddgidffhoh).
 
-[Chrome ウェブストア](https://chromewebstore.google.com/detail/facibox/plgjjiajhegekckmccfgnhddgidffhoh)からインストールできます。
+## Features
 
-## Features / 機能
-
-- **Dice** - Roll dice with configurable faces and count / サイコロ（面数・個数設定可）
-- **Roulette** - Spin wheel to randomly select from items / ルーレットでランダム選出
-- **Timer** - Countdown timer with overtime tracking and alarm / タイマー（超過カウント・アラーム付き）
-- **Theme Picker** - Randomly pick a theme from registered items / テーマをランダムに決定
+- **Dice** - Roll dice with configurable faces and count
+- **Roulette** - Spin wheel to randomly select from items
+- **Timer** - Countdown timer with overtime tracking and alarm
+- **Theme Picker** - Randomly pick a theme from registered items
 
 ### Highlights
 
