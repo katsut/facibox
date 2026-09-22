@@ -10,6 +10,14 @@ updates:
       production-dependencies:
         dependency-type: production
     open-pull-requests-limit: 10
+    ignore:
+      # typescript-eslint has no TS 7 support yet, so a TypeScript major bump
+      # breaks `pnpm lint` ("typescript-eslint does not support TS 7.0") and
+      # also `tsc --noEmit`, which stops resolving the global `chrome` types.
+      # Tracking: https://github.com/typescript-eslint/typescript-eslint/issues/10940
+      # Revisit once typescript-eslint ships TS >=7 support.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /
